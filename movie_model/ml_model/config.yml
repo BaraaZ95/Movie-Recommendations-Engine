@@ -1,0 +1,34 @@
+# Package name
+package_name: movies_prediction
+
+# Data files
+data: movies.data
+movies: movies_metadata.csv
+credits: credits.csv
+keywords: keywords.csv
+
+# Dataset column name
+column_names: 
+  - original_title
+  - popularity
+  - weighted_average
+  - score
+  - bag_of_words
+
+#Features
+features:   
+  - original_title
+  - popularity
+  - weighted_average
+  - score
+  - bag_of_words
+ 
+original_title: original_title
+popularity: popularity
+weighted_average: weighted_average
+score: score
+bag_of_words: bag_of_word
+
+# Data for the recommendations
+FINAL_DF_NAME: 'final_df.parquet'
+COS_SIM_NAME: 'cosine_similarity.pickle' #or skops
