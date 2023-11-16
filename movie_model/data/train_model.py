@@ -12,19 +12,16 @@ from data.wandb_log import load_and_log
 _logger = logging.getLogger(__name__)
 
 
-def train_model():
-    cos_sim = prepare_data()
-    # SIM_MATRIX_NAME = 'cosine_similarity.skops' # If using skops
-    _logger.info(f"Saving the cosine similarity matrix as {COS_SIM_NAME}")
-    # Save the similarity matrix using skops
-    # serialized = dump(cos_sim, SIM_MATRIX_NAME)
-    # Save using pickle
-    pickle.dump(cos_sim, open(COS_SIM_NAME, "wb"))
-    # or dump(cos_sim, "COS_SIM_NAME.skops")
-    _logger.info("Data preprocessing complete...")
-
-
 if __name__ == "main":
-    train_model()
+    #    prepare_data()
     # After the model is trained, log all the outputs to Weights and Biases
+    _logger.info("Data preprocessing...")
+    prepare_data()
+    _logger.info("Data preprocessing complete")
+    _logger.info("Logging data to Weights and Biases...")
+    load_and_log()
+    _logger.info("Data successfully logged Weights and Biases")
+    # Note: Better try exceptions can be added to make sure the file was logged successfully and file checking
+    # Also sas per the wandb documentation, the cos_sim file is almost 1GB: The size of your data is too large.
+    # Large data sizes could introduce a >1ms overhead to the training loop.
     load_and_log()

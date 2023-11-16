@@ -6,6 +6,11 @@ __pycache__/
 # C extensions
 *.so
 
+# Large files ( Files greater than 100mb will not be uploaded to github)
+ratings.csv
+credits.csv
+cos_sim.parquet
+
 # Distribution / packaging
 .vscode
 .Python
@@ -26,6 +31,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+wandb/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
