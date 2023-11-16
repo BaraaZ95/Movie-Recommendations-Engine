@@ -1,4 +1,5 @@
 import os
+from sqlalchemy import desc
 import wandb
 import pandas as pd
 
@@ -6,10 +7,10 @@ import pandas as pd
 
 
 def load():
-    credits = pd.read_csv("ml_model/data/raw/credits.csv")
-    keywords = pd.read_csv("ml_model/data/raw/keywords.csv")
+    credits = pd.read_csv("movie_model/data/raw/credits.csv")
+    keywords = pd.read_csv("movie_model/data/raw/keywords.csv")
     movies = (
-        pd.read_csv("ml_model/data/raw/movies_metadata.csv", low_memory=False)
+        pd.read_csv("movie_model/data/raw/movies_metadata.csv", low_memory=False)
         .drop(
             [
                 "belongs_to_collection",
@@ -32,32 +33,25 @@ def load():
 
 def load_and_log():
     # 🚀 start a run, with a type to label it and a project it can call home
-    with wandb.init(project="movies-project", job_type="load-data") as run:
-        # Start a W&B run to log data
-        datasets = load()  # separate code for loading the datasets
-        names = ["credits", "keywords", "movie"]
-        movie_table_artifact = wandb.Artifact(
-            "movies_artifact",
+    wandb.init(project="movies-project", job_type="load-data")
+
+    datasets = load()  # separate code for loading the datasets
+    names = ["credits", "keywords", "movie"]
+
+    # Convert the DataFrame into a W&B Table
+    for name, dataset in zip(names, datasets):
+        artifact_name = f"{name}"
+        artifact = wandb.Artifact(
+            artifact_name,
             type="dataset",
-            description="Raw MNIST dataset, split into train/val/test",
-            metadata={
-                "source": "imdb",
-                "sizes": [len(dataset) for dataset in datasets],
-            },
+            metadata={"source": "imdb", "size": dataset.shape},
+            description="Movies details datasets",
         )
-        # Convert the DataFrame into a W&B Table
-        for name, dataset in zip(names, datasets):
-            wandb_table = wandb.Table(dataframe=dataset)
-            movie_table_artifact.add(wandb_table, f"{name}_table")
-            # Log the table to visualize with a run...
-            run.log({f"{name}": wandb_table})
+        wandb_table = wandb.Table(dataframe=dataset)
+        # Log the raw csv file within an artifact to preserve our data
+        artifact.add(wandb_table, f"{name}-dataset")
+        # Log the table to visualize with a run...
+        wandb.log_artifact(artifact)
 
-            # Log the raw csv file within an artifact to preserve our data
-            movie_table_artifact.add(dataset, f"{name}-dataset")
-
-            # Add the cosine similarity matrix
-            cos_sim = pd.read_csv("ml_model/data/raw/cos_sim.pkl")
-            movie_table_artifact.add(cos_sim, "cos_sim")
-
-        # Finish the run (useful in notebooks)
-        run.finish()
+    # Finish the run (useful in notebooks)
+    wandb.finish()
