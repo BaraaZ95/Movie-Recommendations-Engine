@@ -6,7 +6,6 @@ from config import settings, setup_app_logging
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
-from loguru import logger
 
 app = FastAPI(
     title=settings.PROJECT_NAME,

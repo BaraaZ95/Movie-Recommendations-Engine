@@ -4,7 +4,7 @@ import sys
 file = Path(__file__).resolve()
 parent, root = file.parent, file.parents[3]
 sys.path.append(str(root))
-from typing import Any, List, Optional, Dict
+from typing import Any, Optional
 
 # from movie_model.data.data_validation import MovieInputData
 from pydantic import BaseModel

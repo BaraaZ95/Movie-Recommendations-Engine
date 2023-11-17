@@ -11,7 +11,7 @@ from data.wandb_log import load_and_log
 # from skops.io import dump
 _logger = logging.getLogger(__name__)
 
-
+prepare_data()
 if __name__ == "main":
     #    prepare_data()
     # After the model is trained, log all the outputs to Weights and Biases
@@ -19,9 +19,8 @@ if __name__ == "main":
     prepare_data()
     _logger.info("Data preprocessing complete")
     _logger.info("Logging data to Weights and Biases...")
-    load_and_log()
-    _logger.info("Data successfully logged Weights and Biases")
     # Note: Better try exceptions can be added to make sure the file was logged successfully and file checking
     # Also sas per the wandb documentation, the cos_sim file is almost 1GB: The size of your data is too large.
     # Large data sizes could introduce a >1ms overhead to the training loop.
-    load_and_log()
+    # load_and_log()
+    _logger.info("Data successfully logged Weights and Biases")

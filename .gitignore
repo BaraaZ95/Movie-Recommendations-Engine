@@ -13,6 +13,7 @@ cos_sim.parquet
 
 # Distribution / packaging
 .vscode
+.web_cache
 .Python
 build/
 develop-eggs/

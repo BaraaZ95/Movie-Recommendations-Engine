@@ -28,24 +28,22 @@ def predict_movie(
     validated_input, errors = validate_inputs(input=title)
     if not errors:
         _logger.info(f"Making predictions with model version: {__version__} ")
-        filename_data = ROOT + r"\movie_model\data\clean\final_df.parquet"
-        filename_matrix = ROOT + r"\movie_model\data\clean\cos_sim.pkl"
+        # Load the movies dataset and the similarity matrix
+        filename_data = ROOT + "/movie_model/data/clean/final_df.parquet"
+        filename_sim = ROOT + "/movie_model/data/clean/cos_sim.parquet"
         data = pd.read_parquet(
             filename_data,
-            columns=["score", "original_title", "id"],
+            columns=["score", "id", "original_title"],
         ).reset_index()
+        # Check if the movie is available before loading the similarity matrix
         if validated_input not in data["original_title"].values:
             raise MovieNotFoundError(input)
         else:
-            index_movie = data[data["original_title"] == validated_input].index
-            similarity = pickle.load(
-                open(
-                    filename_matrix,
-                    "rb",
-                )
-            )[index_movie].T
-            sim_df = pd.DataFrame(similarity, columns=["similarity"])
-            final_df = pd.concat([data, sim_df], axis=1)
+            cos_sim = pd.read_parquet(filename_sim)
+            index_movie = data[data["original_title"] == "Toy Story"].index[0]
+            similarity = cos_sim.values[index_movie].T
+            sim_df_ = pd.DataFrame(similarity, columns=["similarity"])
+            final_df = pd.concat([data, sim_df_], axis=1)
             # The number can be tinkered with
             final_df["final_score"] = (
                 final_df["score"] * (1 - similarity_weight)
@@ -67,4 +65,4 @@ def predict_movie(
             return results
 
 
-# print(predict_movie("toy Story"))
+print(predict_movie(title="toy Story"))

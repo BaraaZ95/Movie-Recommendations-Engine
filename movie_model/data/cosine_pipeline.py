@@ -96,6 +96,7 @@ def prepare_data():
 
     final_df = df[
         [
+            "id",
             "original_title",
             "adult",
             "genres",
@@ -127,9 +128,9 @@ def prepare_data():
     )
     final_df.set_index("original_title", inplace=True)
 
-    final_df = final_df[["bag_of_words"]]
+    final_df_ = final_df[["bag_of_words", "id"]]
     final_df = weighted_df_sorted[:10000].merge(
-        final_df, left_index=True, right_index=True, how="left"
+        final_df_, left_index=True, right_index=True, how="left"
     )
     # Calculate cosine similary between the movies. The df can be sliced to reduce the extensiveness of the resources
     # Add the id to the df to use it to retrive its info from the api
@@ -139,4 +140,6 @@ def prepare_data():
     cos_sim_df = pd.DataFrame(cos_sim).T
     cos_sim_df.to_parquet(f"movie_model/data/clean/{COS_SIM_NAME}", index=False)
     _logger.info(f"Saving the dataset as {FINAL_DF_NAME}")
-    final_df.to_parquet(f"movie_model/data/clean/{FINAL_DF_NAME}", index=False)
+    final_df.reset_index().to_parquet(
+        f"movie_model/data/clean/{FINAL_DF_NAME}", index=False
+    )

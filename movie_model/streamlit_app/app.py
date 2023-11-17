@@ -11,24 +11,22 @@ import requests
 import pandas as pd
 from cachecontrol import CacheControl
 from cachecontrol.caches import FileCache
-from loguru import logger
 
 from movie_api.app import __version__
-from movie_api.app.config import settings
 
 st.set_page_config(layout="wide")
 
 
 @st.cache_data(persist="disk")
 def load_movies():
-    filepath = str(root) + r"\data\clean\final_df.parquet"
+    filepath = str(root) + "/data/clean/final_df.parquet"
     loaded_movies = pd.read_parquet(filepath, columns=["original_title"])
     return loaded_movies["original_title"].values
 
 
 movies = load_movies()
 
-api_key = os.getenv("API_KEY")
+api_key = "4fd4163a219619df68ee87332b923674"  # os.getenv("API_KEY")
 
 
 def fetch_poster(movie_id):
@@ -40,7 +38,6 @@ def fetch_poster(movie_id):
         headers=headers,
     )
     data = response.json()
-    # print(data)
     return "https://image.tmdb.org/t/p/w500/" + data["poster_path"]
 
 
@@ -50,12 +47,10 @@ v = st.write(
     """ <h2> <b style="color:red"> Movie Recommendations Engine</b> </h2>""",
     unsafe_allow_html=True,
 )
-# st.header(v)
-# st.header(" :red[MoviesWay]")
 st.write("###")
 
 st.write(
-    """ <p> Hi, welcome to <b style="color:red">Movie Recommendations Engine</b> Mh free movie recommendation engine </p>""",
+    """ <p> Hi, welcome to my  <b style="color:red">Movie Recommendations Engine</b> </p>""",
     unsafe_allow_html=True,
 )
 st.write("##")
