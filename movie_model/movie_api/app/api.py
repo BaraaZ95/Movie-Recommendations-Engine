@@ -1,23 +1,17 @@
 import sys
 from pathlib import Path
 
-from httpx import request
-
 file = Path(__file__).resolve()
 parent, root = file.parent, file.parents[3]
 sys.path.append(str(root))
-from annotated_types import T
 
 # from movie_model.data.validation import MoviePredictionInputModel
 from movie_model.movie_api.app.schemas.predict_api import PredictionResults
-from fastapi.encoders import jsonable_encoder
 from movie_model.ml_model.predict import predict_movie
 import json
-from typing import Any, Dict, List, Optional
-import numpy as np
-import pandas as pd
+from typing import Any, Dict
+
 from fastapi import APIRouter, HTTPException
-from fastapi.encoders import jsonable_encoder
 from movie_model import __version__ as model_version
 from loguru import logger
 from movie_model.movie_api.app import schemas
@@ -41,7 +35,7 @@ def health() -> Dict:
     return health.dict()
 
 
-@api_router.post("/predict", response_model=PredictionResults)
+@api_router.post(path="/predict", response_model=PredictionResults)
 async def predict(response: MovieInputData) -> Any:
     """
     Make predictions with the ML model

@@ -1,4 +1,5 @@
 import logging
+from re import DEBUG
 import sys
 from types import FrameType
 from typing import List, cast
@@ -7,22 +8,23 @@ from loguru import logger
 from pydantic import AnyHttpUrl, BaseSettings
 
 
-class LoggingSettings(BaseSettings):
-    LOGGING_LEVEL: int = logging.INFO  # logging levels are type int
+class LoggingSettings(BaseSettings):  # type: ignore
+    LOGGING_LEVEL: int  # logging levels are type int
 
 
-class Settings(BaseSettings):
+class Settings(BaseSettings):  # type: ignore
     API_V1_STR: str = "/api/v1"
 
     # Meta
     logging: LoggingSettings = LoggingSettings()
+    DEBUG: bool = False
 
     # BACKEND_CORS_ORIGINS is a comma-separated list of origins
     # e.g: http://localhost,http://localhost:4200,http://localhost:3000
+
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
-        "http://localhost:3000",
         "http://localhost:8000",
-        "https://localhost:3000",
+        "https://localhost:3000",  # type: ignore
         "https://localhost:8000",
     ]
 
