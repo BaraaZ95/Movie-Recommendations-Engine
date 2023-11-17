@@ -1,5 +1,3 @@
-import os
-from sqlalchemy import desc
 import wandb
 import pandas as pd
 
@@ -10,8 +8,7 @@ def load():
     credits = pd.read_csv("movie_model/data/raw/credits.csv")
     keywords = pd.read_csv("movie_model/data/raw/keywords.csv")
     movies = (
-        pd.read_csv("movie_model/data/raw/movies_metadata.csv", low_memory=False)
-        .drop(
+        pd.read_csv("movie_model/data/raw/movies_metadata.csv", low_memory=False).drop(
             [
                 "belongs_to_collection",
                 "homepage",
@@ -23,8 +20,7 @@ def load():
             ],
             axis=1,
         )
-        .drop([19730, 29503, 35587])
-    )  # Incorrect data type
+    ).dropna(subset=["tagline"])
 
     datasets = [credits, keywords, movies]
 

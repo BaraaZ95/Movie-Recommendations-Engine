@@ -1,4 +1,3 @@
-from fileinput import filename
 import sys
 from pathlib import Path
 from typing import Any
@@ -12,7 +11,6 @@ from movie_model import __version__
 import pandas as pd
 
 # from skops.io import load
-import pickle
 from data.data_validation import validate_inputs, MovieNotFoundError
 from data.cosine_pipeline import COS_SIM_NAME
 import logging

@@ -6,14 +6,12 @@ from sklearn.metrics.pairwise import cosine_similarity
 import logging
 
 # from skops.io import dump
-import joblib
 
 _logger = logging.getLogger(__name__)
 
 
 FINAL_DF_NAME = "final_df.parquet"
-COS_SIM_NAME = "cos_sim.parquet"  # or skops can be used
-
+COS_SIM_NAME = "cos_sim.parquet"  # or skops can be used but it takes a lot more space
 
 # Load the datasets
 
@@ -37,7 +35,7 @@ def prepare_data():
             ],
             axis=1,
         )
-        .drop([19730, 29503, 35587])
+        .dropna(subset=["tagline"])
     )  # Incorrect data type
 
     movies["id"] = movies["id"].astype("int64")

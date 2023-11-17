@@ -22,5 +22,5 @@ if __name__ == "main":
     # Note: Better try exceptions can be added to make sure the file was logged successfully and file checking
     # Also sas per the wandb documentation, the cos_sim file is almost 1GB: The size of your data is too large.
     # Large data sizes could introduce a >1ms overhead to the training loop.
-    # load_and_log()
+    # load_and_log() # If you wish to log the movies datasets to wandb
     _logger.info("Data successfully logged Weights and Biases")
