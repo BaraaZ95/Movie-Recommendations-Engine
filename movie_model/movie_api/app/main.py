@@ -1,9 +1,8 @@
 from typing import Any
 from fastapi import FastAPI, Request
-from typing import Any
-from api import api_router
+from app.api import api_router
 from config import settings, setup_app_logging
-from fastapi import APIRouter, FastAPI, Request
+from fastapi import APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
@@ -24,7 +23,7 @@ def index(request: Request) -> Any:
     body = (
         "<html>"
         "<body style='padding: 10px;'>"
-        "<h1>Welcome to the API</h1>"
+        "<h1>Welcome to z API</h1>"
         "<div>"
         "Check the docs: <a href='/docs'>here</a>"
         "</div>"

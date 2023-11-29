@@ -1,9 +1,15 @@
 import pandas as pd
-from .data_preprocessing import get_text, remove_punctuation, separate
+from .data_preprocessing import (
+    get_text,
+    remove_punctuation,
+    separate,
+    melt_similarity_matrix_in_batches,
+)
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import logging
+from postgres import upload_to_postgres
 
 # from skops.io import dump
 
@@ -12,7 +18,7 @@ _logger = logging.getLogger(__name__)
 
 FINAL_DF_NAME = "final_df.parquet"
 COS_SIM_NAME = "cos_sim.parquet"  # or skops can be used but it takes a lot more space
-
+TABLE_NAME = "test"
 # Load the datasets
 
 _logger.info("Loading the dataset")
@@ -136,8 +142,25 @@ def prepare_data():
     tfidf_matrix = tfidf.fit_transform(final_df["bag_of_words"])
     cos_sim = cosine_similarity(tfidf_matrix)
     cos_sim_df = pd.DataFrame(cos_sim).T
+    _logger.info(f"Saving the  as {FINAL_DF_NAME}")
     cos_sim_df.to_parquet(f"movie_model/data/clean/{COS_SIM_NAME}", index=False)
-    _logger.info(f"Saving the dataset as {FINAL_DF_NAME}")
+    _logger.info(f"Saving the cosine similarity matrix as {COS_SIM_NAME}")
     final_df.reset_index().to_parquet(
         f"movie_model/data/clean/{FINAL_DF_NAME}", index=False
     )
+    upload_to_postgres(
+        final_df, "movies"
+    )  # This step may be done in the train_model file, but doing it here is faster since you won't need to reread a df again
+    # Melt the similarity matrix to prepare it to appropriate format
+    melted_similarity_result = melt_similarity_matrix_in_batches(cos_sim_df)
+    melted_similarity_result.to_csv(
+        "movie_model/data/clean/sim_matrix.csv",
+        header=True,
+        index=False,
+        encoding="utf-8",
+        chunksize=1000,
+    )
+
+
+if __name__ == "__main__":
+    prepare_data()

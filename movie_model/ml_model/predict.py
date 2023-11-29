@@ -12,7 +12,6 @@ import pandas as pd
 
 # from skops.io import load
 from data.data_validation import validate_inputs, MovieNotFoundError
-from data.cosine_pipeline import COS_SIM_NAME
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -63,4 +62,4 @@ def predict_movie(
             return results
 
 
-print(predict_movie(title="toy Story"))
+# print(predict_movie(title="toy Story"))

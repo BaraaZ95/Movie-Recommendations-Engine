@@ -1,64 +1,34 @@
-import os
-from dotenv import load_dotenv
-
-# from movie_model.data.validation import MoviePredictionInputModel
-from app.schemas.items import SimilarMovie
-from typing import Dict, Any
-
-from app.schemas.health import Health
-from app.schemas.items import MovieInput
-
-from app import __version__
-from app.config import settings
-
-# from data.data_validation import MovieInputData
+# import os
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, APIRouter
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 from fastapi.params import Depends
 from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import DeclarativeBase
-from app.models import Movie
+from sqlalchemy import Integer, String, create_engine, text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Mapped, mapped_column
+
+Base = declarative_base()
+
+app = FastAPI()
 
 
-@asynccontextmanager
-async def lifespan_db(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
-    yield
+class MovieID(BaseModel):
+    movie_id: int
 
 
-api_router = APIRouter()
-app = FastAPI(lifespan=lifespan_db)
+host = "172.17.42.151"
+port = 5433
+database = "test"
+user = "postgres"
+password = "pass"
 
-
-class Base(DeclarativeBase):
-    pass
-
-
-@api_router.get("/health", response_model=Health, status_code=200)
-def health() -> Dict:
-    """
-    Root Get
-    """
-    health = Health(name=settings.PROJECT_NAME, api_version=__version__)
-
-    return dict(health)
-
-
-# Initialize environment variables
-load_dotenv()
-
-# PostgreSQL connection string
-dialect = os.getenv("dialect")
-host = os.getenv("host")
-port = os.getenv("port")
-database = os.getenv("database")
-username = os.getenv("username")
-password = os.getenv("password")
-engine = create_engine(f"{dialect}://{username}:{password}@{host}:{port}/{database}")
+engine = create_engine(f"postgresql://{user}:{password}@{host}:{port}/{database}")
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
+# database_url = os.environ.get("DATABASE_URL")
+# engine = create_engine(database_url)
 # Function to get a database session
 def get_db() -> Session:  # type: ignore
     db = SessionLocal()
@@ -77,30 +47,44 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
+class MovieNameInput(BaseModel):
+    movie_name: str
+
+
 class MovieOutput:
     original_title: str
+
+
+class Movie(Base):
+    __tablename__ = "movies"
+    movie_index: Mapped[int] = mapped_column(primary_key=True, index=True)
+    original_title: Mapped[str] = mapped_column(String(30))
+    id: Mapped[int] = mapped_column(
+        Integer
+    )  # IMDB id used to retrieve artwork and other information
 
 
 # Function to get movie index from movie name
 # @app.get("/get_movie_index/{movie_name}")
 def get_movie_index(movie_name: str, db: Session = Depends(get_db)):  # type: ignore
+    # db_item = db.query(DBItem).filter(DBItem.id == item_id).first()
     movie = db.query(Movie).filter(Movie.original_title == movie_name).first()
     if movie:
         return movie.movie_index
-    raise HTTPException(status_code=404, detail="Movie not found!")
+    raise HTTPException(status_code=404, detail="Movie not found")
 
 
-@api_router.post(path="/predict", response_model=list[SimilarMovie])
 async def get_similar_movies_dict(
-    response: MovieInput, db: Session = Depends(get_db)  # type: ignore
-) -> Any:
-    input_movie_name = response.movie
+    movie_input: MovieNameInput, db: Session = Depends(get_db)  # type: ignore
+):
+    input_movie_name = movie_input.movie_name
     # Use a database session to get the movie_index from the movie name
+    print(input_movie_name)
+
     movie_index = get_movie_index(input_movie_name, db)
+    print(movie_index)
     if movie_index is None:
-        return {
-            "error": "Movie not found. Cannot establish connection to similarity matrix db when movie unknown!"
-        }
+        return {"error": "Movie not found"}
     sql = """
    -- Select the other_movie_index, similarity_score, and other_movie_name, along with id
 SELECT
@@ -123,7 +107,7 @@ ORDER BY
     sim.similarity_score DESC
 -- Limit the result to the top 10 rows
 LIMIT 10;
-        """
+   """
     with engine.connect() as connection:
         result = connection.execute(text(sql).bindparams(input_movie_id=movie_index))
         rows = result.fetchall()

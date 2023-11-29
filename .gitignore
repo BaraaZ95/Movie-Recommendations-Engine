@@ -6,12 +6,19 @@ __pycache__/
 # C extensions
 *.so
 
+# Secrets
+secrets.toml
+Testing.ipynb
+
 # Large files ( Files greater than 100mb will not be uploaded to github)
 ratings.csv
 credits.csv
 cos_sim.parquet
+sim_matrix.csv
+melt_sim.csv
 
 # Distribution / packaging
+.history
 .vscode
 .web_cache
 .Python

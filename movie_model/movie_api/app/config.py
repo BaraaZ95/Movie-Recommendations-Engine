@@ -1,12 +1,11 @@
 import logging
-from re import DEBUG
 import sys
 from types import FrameType
 from typing import List, cast
 
 from loguru import logger
 from pydantic import AnyHttpUrl
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class LoggingSettings(BaseSettings):
@@ -14,6 +13,8 @@ class LoggingSettings(BaseSettings):
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(case_sensitive=True)
+
     API_V1_STR: str = "/api/v1"
 
     # Meta
@@ -27,12 +28,10 @@ class Settings(BaseSettings):
         "http://localhost:8000",
         "https://localhost:3000",
         "https://localhost:8000",
+        "http://localhost:8502",  # Add Streamlit origin
     ]
 
     PROJECT_NAME: str = "Movie Recommendation API"
-
-    class Config:
-        case_sensitive = True
 
 
 # See: https://loguru.readthedocs.io/en/stable/overview.html#entirely-compatible-with-standard-logging  # noqa

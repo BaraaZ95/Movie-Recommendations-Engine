@@ -1,0 +1,46 @@
+version: '3.8'
+
+services: 
+  api:
+    build:
+      context: movie_api/
+      target: pv
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./movie_api:/movie_model
+    command: "uvicorn main:app --host 0.0.0.0 --port 8001 --reload"
+    restart: always
+    networks:
+      - app
+    container_name: api
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5435:5435"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: test
+
+  ui: 
+    build:
+      context: streamlit_app/
+      target: pv
+    command: streamlit run app.py --server.port 8502
+    ports:
+      - "8502:8502"
+    depends_on:
+      - api
+      - postgres
+    volumes: 
+    - ./streamlit_app:/movie_model
+    - ./movie_model/streamlit_app/secrets.toml:/movie_model/streamlit_app/secrets.toml
+    restart: always
+    networks:
+      - app
+    container_name: ui
+networks:
+  app:
+    driver: bridge
