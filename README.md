@@ -71,8 +71,6 @@ Backend
 
 The backend is built with FastAPI, providing a RESTful API to interact with the recommendation system. Key endpoints include:
 
-    /api/similarity-matrix: Retrieve the similarity matrix data.
-
 Frontend
 
 The frontend is developed using Streamlit, offering a user-friendly interface for users to interact with the recommendation system.
