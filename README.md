@@ -14,6 +14,11 @@ Make sure you have the following prerequisites installed:
 - pip (Python package installer)
 - Postgreql
 
+## Data Source
+Data was obtained courtesy of Kaggle and can be downloaded [here](https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset/).
+However, you do not need to download it to run the project
+
+
 ## Installation
 
 Clone the repository and install the Python dependencies. 

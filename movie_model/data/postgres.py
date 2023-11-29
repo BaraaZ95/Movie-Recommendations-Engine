@@ -82,18 +82,14 @@ def create_sim_matrix_table():
     conn.close()
 
 
-def send_csv_to_psql(csv, table_):
+def send_csv_to_psql(csv, table):
     conn = psycopg2.connect(
         host=PG_HOST, database=PG_DATABASE, user=PG_USER, password=PG_PASSWORD
     )
     # Copying a csv to postgres is much faster than writing the dataframe to postgres
     sql = "COPY %s FROM STDIN WITH CSV HEADER DELIMITER AS ','"
     file = open(csv, "r")
-    table = table_
     with conn.cursor() as cur:
         cur.execute("truncate " + table + ";")  # avoiding uploading duplicate data!
         cur.copy_expert(sql=sql % table, file=file)  # type: ignore
         conn.commit()
-    #         cur.close()
-    #         conn.close()
-    return conn.commit()
