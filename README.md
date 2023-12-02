@@ -22,12 +22,11 @@ However, you do not need to download it to run the project
 ## Installation
 
 Clone the repository and install the Python dependencies. 
+Download the data and unpack it to the data/raw folder. You can then run the script and it will store the cleaned data for you in data/clean
 
 Configuration
 
 Set up your configuration by modifying the .env file:
-
-ini
 
 .env environment variables
 ```
